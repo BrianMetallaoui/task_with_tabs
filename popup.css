@@ -42,3 +42,8 @@ p {
 .pathname {
   display: inline-block;
 }
+
+.title {
+  color: blue;
+  text-decoration: underline;
+}

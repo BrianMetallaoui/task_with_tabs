@@ -57,10 +57,7 @@ function loadTasks() {
       element.querySelector(".title").textContent = task.taskName;
       element.querySelector(".pathname").textContent = task.tabs.length;
       element.querySelector("a").addEventListener("click", async () => {
-        //Open all tabs
-        for (let i = 0; i < task.tabs.length; i++) {
-          chrome.tabs.create({ url: task.tabs[i].url });
-        }
+        openLinks(task.tabs);
       });
       element.querySelector(".update").addEventListener("click", async () => {
         updateTask(i);
@@ -102,6 +99,22 @@ function updateTask(index) {
       loadTasks();
     });
   });
+}
+
+function openLinks(tabsToOpen) {
+  //Close all non-active tabs
+  chrome.tabs.query({ currentWindow: true }, (tabs) => {
+    for (let i = 0; i < tabs.length; i++) {
+      if (!tabs[i].active) {
+        chrome.tabs.remove(tabs[i].id);
+      }
+    }
+  });
+
+  //Open all tabs
+  for (let i = 0; i < tabsToOpen.length; i++) {
+    chrome.tabs.create({ url: tabsToOpen[i].url });
+  }
 }
 
 //delete all tasks and reload tasks
