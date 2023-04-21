@@ -11,7 +11,7 @@ class Task {
     this.tabs = tabs;
   }
 }
-let tasks = [];
+let localTasks = [];
 
 button.addEventListener("click", async () => {
   //Save all tabs to local storage
@@ -24,8 +24,8 @@ async function saveTabs() {
   //Create new task object
   if (input.value !== "") {
     const task = new Task(input.value, tabs);
-    tasks.push(task);
-    chrome.storage.local.set({ tasks: tasks }, () => {
+    localTasks.push(task);
+    chrome.storage.local.set({ tasks: localTasks }, () => {
       console.log("Task saved");
       loadTasks();
 
@@ -47,12 +47,18 @@ function loadTasks() {
   ul.innerHTML = "";
   chrome.storage.local.get(["tasks"], (result) => {
     console.log("Tasks loaded");
-    console.log(tasks.length);
-    tasks = result.tasks;
+    console.log(localTasks.length);
+
+    //if result.tasks is not a list make it a blank list
+    if (!result.tasks) {
+      result.tasks = [];
+    }
+
+    localTasks = result.tasks;
     elements.clear();
 
-    for (let i = 0; i < tasks.length; i++) {
-      let task = tasks[i];
+    for (let i = 0; i < localTasks.length; i++) {
+      let task = localTasks[i];
       const element = template.content.firstElementChild.cloneNode(true);
       element.querySelector(".title").textContent = task.taskName;
       element.querySelector(".pathname").textContent = task.tabs.length;
