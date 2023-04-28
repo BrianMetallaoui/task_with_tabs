@@ -108,19 +108,27 @@ function updateTask(index) {
 }
 
 function openLinks(tabsToOpen) {
-  //Close all non-active tabs
+  //Open all tabs from tabsToOpen in current window and close the other tabs in the window
   chrome.tabs.query({ currentWindow: true }, (tabs) => {
-    for (let i = 0; i < tabs.length; i++) {
-      if (!tabs[i].active) {
-        chrome.tabs.remove(tabs[i].id);
-      }
+    const tabsToClose = tabs.filter((tab) => !tabsToOpen.includes(tab));
+    for (let tab of tabsToOpen) {
+      chrome.tabs.create({ url: tab.url });
     }
+    chrome.tabs.remove(tabsToClose.map((tab) => tab.id));
   });
 
-  //Open all tabs
-  for (let i = 0; i < tabsToOpen.length; i++) {
-    chrome.tabs.create({ url: tabsToOpen[i].url });
-  }
+  //Focus on the first tab
+  chrome.tabs.query({ currentWindow: true }, (tabs) => {
+    chrome.tabs.update(tabs[0].id, { active: true });
+  });
+
+  // //Open all tabs from tabsToOpen in a new window
+  // chrome.windows.create({ url: tabsToOpen.map((tab) => tab.url) });
+
+  // //Close previous window
+  // chrome.windows.getCurrent((window) => {
+  //   chrome.windows.remove(window.id);
+  // });
 }
 
 //delete all tasks and reload tasks
