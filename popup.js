@@ -4,6 +4,8 @@ const input = document.getElementById("input");
 const deleteAll = document.getElementById("deleteAll");
 const elements = new Set();
 
+const storageKey = "tabsWithTasks";
+
 //class with with properties, taskName and tabs
 class Task {
   constructor(taskName, tabs) {
@@ -45,7 +47,7 @@ function loadTasks() {
   //Replace document.querySelector("ul") with new elements
   const ul = document.getElementById("ul");
   ul.innerHTML = "";
-  chrome.storage.local.get(["tasks"], (result) => {
+  chrome.storage.local.get([storageKey], (result) => {
     console.log("Tasks loaded");
     console.log(localTasks.length);
 
@@ -87,7 +89,7 @@ deleteAll.addEventListener("click", async () => {
 
 //Delete task at index and update local storage then reload tasks
 function deleteTask(index) {
-  chrome.storage.local.get(["tasks"], (result) => {
+  chrome.storage.local.get([storageKey], (result) => {
     result.tasks.splice(index, 1);
     chrome.storage.local.set({ tasks: result.tasks }, () => {
       console.log("Task deleted");
@@ -98,7 +100,7 @@ function deleteTask(index) {
 
 //Update task at index and update local storage then reload tasks
 function updateTask(index) {
-  chrome.storage.local.get(["tasks"], async (result) => {
+  chrome.storage.local.get([storageKey], async (result) => {
     result.tasks[index].tabs = await getTabs();
     chrome.storage.local.set({ tasks: result.tasks }, () => {
       console.log("Task updated");
